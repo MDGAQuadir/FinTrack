@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 48 48">
+  <!-- Rounded Wallet Body background gradient -->
+  <rect width="40" height="32" x="4" y="10" fill="url(#walletGrad)" rx="8" />
+  
+  <!-- Outer flap accent border -->
+  <path d="M4 18h40" stroke="#fff" stroke-opacity="0.15" stroke-width="2" />
+  
+  <!-- Wallet Flap/Clasp -->
+  <path d="M28 20h12v12H28a6 6 0 01-6-6v0a6 6 0 016-6z" fill="#4f46e5" stroke="#818cf8" stroke-width="2" />
+  <circle cx="34" cy="26" r="3" fill="#fff" />
+  
+  <!-- Sparkles in the corner (Insights) -->
+  <path d="M38 4l1.5 3.5L43 9l-3.5 1.5L38 14l-1.5-3.5L33 9l3.5-1.5L38 4z" fill="#f59e0b" />
+  <path d="M12 4l1 2.5L15.5 7.5l-2.5 1L12 11l-1-2.5L8.5 7.5l2.5-1L12 4z" fill="#60a5fa" opacity="0.8" />
+  
+  <defs>
+    <linearGradient id="walletGrad" x1="4" y1="10" x2="44" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#818cf8" />
+      <stop offset="1" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,62 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+application-local.properties
+application-secret.properties
+application-secrets.properties
+*.secret
+*.key
+*.pem
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Production & Build Outputs
+dist/
+frontend/dist/
+dist-ssr/
+*.local
+build/
+backend/target/
+target/
+backups/
+*.sql.gz
+
+# Java / Maven
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+backend/.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE & OS Artifacts
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

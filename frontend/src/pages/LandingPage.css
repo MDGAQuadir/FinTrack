@@ -1,0 +1,90 @@
+/* Custom styles for FinTrack LandingPage */
+
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.05); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 25px) scale(1.06); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+@keyframes dash { to { stroke-dashoffset: -24; } }
+
+.landing-body .blob-a { animation: float-a 14s ease-in-out infinite; }
+.landing-body .blob-b { animation: float-b 18s ease-in-out infinite; }
+.landing-body .ring-spin { animation: spin-slow 40s linear infinite; }
+.landing-body .pulse-dot { animation: pulse-ring 2.2s infinite; }
+.landing-body .sync-line { stroke-dasharray: 6 6; animation: dash 1.4s linear infinite; }
+
+.landing-body .nav-link { position: relative; }
+.landing-body .nav-link::after {
+  content: '';
+  position: absolute; left: 0; bottom: -4px;
+  width: 0%; height: 2px;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  transition: width .25s ease;
+}
+.landing-body .nav-link:hover::after { width: 100%; }
+
+.landing-body .grid-fade {
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 50%, transparent 100%);
+}
+
+html.dark .landing-body .grid-fade {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+}
+
+.landing-body input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+.landing-body input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 3px solid #4f46e5;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.landing-body ::-webkit-scrollbar { width: 6px; height: 6px; }
+.landing-body ::-webkit-scrollbar-track { background: transparent; }
+.landing-body ::-webkit-scrollbar-thumb { background: rgba(161, 161, 170, 0.4); border-radius: 9999px; }
+.landing-body ::-webkit-scrollbar-thumb:hover { background: rgba(113, 113, 122, 0.6); }
+
+/* Custom analytical dashboard progress bars */
+.progress-bar-fill-credits {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.5s ease-out;
+}
+
+.progress-bar-fill-debits {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  transition: width 0.5s ease-out;
+}

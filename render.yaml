@@ -1,0 +1,83 @@
+# ==============================================================================
+# Render Infrastructure as Code Blueprint: render.yaml
+# Complete 1-Click Deployment for FinTrack on Render:
+# 1. Managed PostgreSQL 16 Database
+# 2. Native Spring Boot Java Web Service
+# 3. Native React + Vite Static Site
+# ==============================================================================
+
+databases:
+  - name: fintrack-postgres
+    databaseName: fintrack
+    user: fintrack_user
+    plan: free
+    region: singapore # or oregon / frankfurt
+    ipAllowList: [] # internal access only
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Backend: Spring Boot Java Web Service (Native Java 21)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: fintrack-backend
+    runtime: java
+    region: singapore
+    plan: free
+    buildCommand: cd backend && mvn clean package -DskipTests
+    startCommand: java -jar backend/target/fintrack-backend-1.0.0.jar
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: DEVELOPMENT_MODE
+        value: "false"
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: fintrack-postgres
+          property: connectionString
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: fintrack-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: fintrack-postgres
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false # Set in Render Dashboard
+      - key: MAIL_PASSWORD
+        sync: false # Set in Render Dashboard
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: GENERIC_WEBHOOK_SECRET
+        sync: false
+
+  # ----------------------------------------------------------------------------
+  # 2. Frontend: React + Vite Static Site (Native Node.js)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: fintrack-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      # Proxy API requests to backend
+      - type: rewrite
+        source: /api/*
+        destination: https://fintrack-backend.onrender.com/api/*
+      # Proxy Actuator health to backend
+      - type: rewrite
+        source: /actuator/health
+        destination: https://fintrack-backend.onrender.com/actuator/health
+      # SPA fallback routing
+      - type: rewrite
+        source: /*
+        destination: /index.html

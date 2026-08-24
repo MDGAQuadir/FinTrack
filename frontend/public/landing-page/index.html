@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinTrack — Personal Finance &amp; Cash Flow Workspace</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Premium animations and micro-effects */
+  @keyframes float-a{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(30px,-20px) scale(1.05); }
+  }
+  @keyframes float-b{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(-30px,25px) scale(1.06); }
+  }
+  @keyframes spin-slow{
+    from{ transform: rotate(0deg); }
+    to{ transform: rotate(360deg); }
+  }
+  @keyframes pulse-ring{
+    0%{ box-shadow: 0 0 0 0 rgba(16,185,129,0.35); }
+    70%{ box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+  }
+  @keyframes dash{ to{ stroke-dashoffset: -24; } }
+
+  .blob-a{ animation: float-a 14s ease-in-out infinite; }
+  .blob-b{ animation: float-b 18s ease-in-out infinite; }
+  .ring-spin{ animation: spin-slow 40s linear infinite; }
+  .pulse-dot{ animation: pulse-ring 2.2s infinite; }
+  .sync-line{ stroke-dasharray: 6 6; animation: dash 1.4s linear infinite; }
+
+  .nav-link{ position: relative; }
+  .nav-link::after{
+    content:'';
+    position:absolute; left:0; bottom:-4px;
+    width:0%; height:2px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    transition: width .25s ease;
+  }
+  .nav-link:hover::after{ width:100%; }
+
+  .grid-fade{
+    background-image:
+      linear-gradient(to right, rgba(0,0,0,0.018) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 50%, transparent 100%);
+  }
+
+  input[type="range"]{ -webkit-appearance:none; appearance:none; height:4px; border-radius:9999px; background: linear-gradient(90deg, #4f46e5, #7c3aed); }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:16px; height:16px; border-radius:9999px;
+    background:#fff; border:3px solid #4f46e5;
+    cursor:pointer; box-shadow: 0 2px 6px rgba(79,70,229,0.3);
+  }
+
+  ::-webkit-scrollbar{ width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track{ background: transparent; }
+  ::-webkit-scrollbar-thumb{ background: rgba(161,161,170,0.4); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover{ background: rgba(113,113,122,0.6); }
+</style>
+</head>
+<body class="antialiased bg-[#fcfcfd] font-['Manrope',sans-serif] text-zinc-800 selection:bg-indigo-100 scroll-smooth [-webkit-font-smoothing:antialiased]">
+
+<!-- ============ NAV ============ -->
+<header class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-white/80 border-b border-zinc-200/50">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 shadow-sm">
+        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
+      </div>
+      <span class="font-bold text-[15px] tracking-tight text-zinc-900">Fin<span class="text-indigo-600 font-medium">Track</span></span>
+    </div>
+
+    <nav class="hidden md:flex items-center gap-8 text-[13px] font-semibold text-zinc-500 tracking-wide">
+      <a href="#features" class="nav-link hover:text-zinc-900 transition-colors">Features</a>
+      <a href="#playground" class="nav-link hover:text-zinc-900 transition-colors">Interactive Demo</a>
+      <a href="#sync" class="nav-link hover:text-zinc-900 transition-colors">Database Sync</a>
+    </nav>
+
+    <a href="/login" class="transition-transform duration-150 active:scale-[0.98] bg-zinc-950 text-white text-[13px] font-semibold px-4.5 py-2 rounded-full hover:bg-zinc-800 shadow-sm">
+      Launch App
+    </a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="relative pt-36 pb-24 px-6 overflow-hidden" style="background: radial-gradient(ellipse 80% 65% at 50% -10%, rgba(99,102,241,0.06) 0%, transparent 60%);">
+  <div class="blob-a absolute rounded-full blur-[90px] pointer-events-none z-0 w-[450px] h-[450px] bg-indigo-100/60 -top-20 left-[10%]"></div>
+  <div class="blob-b absolute rounded-full blur-[90px] pointer-events-none z-0 w-[400px] h-[400px] bg-violet-100/50 top-10 right-[8%]"></div>
+  <div class="absolute inset-x-0 top-0 h-[600px] grid-fade z-0"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto text-center">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-zinc-200/80 text-[12px] font-semibold text-zinc-600 mb-6 shadow-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>
+      Real-Time Cloud Sync · Zero Config
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-zinc-950">
+      Master Your SaaS<br/>
+      Cash Flow, <span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Line by Line.</span>
+    </h1>
+
+    <p class="mt-5 text-zinc-555 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
+      A developer-first personal finance platform and financial operating system. Configurable starting balances, unified transaction ledgers, peer loans, and automated PDF statements.
+    </p>
+
+    <div class="mt-8 flex items-center justify-center gap-4 flex-wrap">
+      <a href="/login" class="transition-transform duration-150 active:scale-[0.98] px-6 py-3 rounded-full bg-indigo-600 text-white font-semibold text-[14px] shadow-lg shadow-indigo-600/15 hover:bg-indigo-500">
+        Get Started Free
+      </a>
+    </div>
+
+    <!-- Dashboard preview -->
+    <div class="mt-16 relative">
+      <div class="absolute -inset-6 bg-gradient-to-b from-indigo-50/30 to-transparent blur-3xl rounded-[40px]"></div>
+      <div class="relative bg-white border border-zinc-200 rounded-2xl p-5 md:p-6 shadow-xl shadow-zinc-200/40 text-left">
+        
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-300"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-300"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>
+          </div>
+          <span class="font-['JetBrains_Mono',monospace] text-[11px] text-zinc-400 font-semibold">workspace / ledger.live</span>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-5">
+          <div class="bg-zinc-50 border border-zinc-150 rounded-xl p-4 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40">
+            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1.5">Total Balance</p>
+            <p class="text-2xl font-bold font-['JetBrains_Mono',monospace] text-zinc-900">₹1,84,250.00</p>
+            <p class="text-[10px] text-zinc-450 mt-1">as of today, 6:42 PM</p>
+          </div>
+          
+          <div class="bg-zinc-50 border border-zinc-150 rounded-xl p-4 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40">
+            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1.5 flex items-center gap-1.5">
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-600"></i> Total Credits
+            </p>
+            <p class="text-2xl font-bold font-['JetBrains_Mono',monospace] text-emerald-600">₹2,40,000.00</p>
+            <p class="text-[10px] text-zinc-450 mt-1">12 inflows this month</p>
+          </div>
+
+          <div class="bg-zinc-50 border border-zinc-150 rounded-xl p-4 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40">
+            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1.5 flex items-center gap-1.5">
+              <i data-lucide="arrow-down-right" class="w-3.5 h-3.5 text-rose-600"></i> Total Debits
+            </p>
+            <p class="text-2xl font-bold font-['JetBrains_Mono',monospace] text-rose-600">₹55,750.00</p>
+            <p class="text-[10px] text-zinc-450 mt-1">28 outflows this month</p>
+          </div>
+        </div>
+
+        <div class="bg-zinc-50/50 border border-zinc-150 rounded-xl overflow-hidden">
+          <div class="px-4 py-2.5 border-b border-zinc-200/85 flex items-center justify-between bg-zinc-50">
+            <span class="text-[12px] font-bold text-zinc-700">Recent Transactions</span>
+            <span class="text-[10px] text-zinc-450 font-['JetBrains_Mono',monospace] uppercase font-bold tracking-wider">Live Log</span>
+          </div>
+          <div class="divide-y divide-zinc-200/50 max-h-48 overflow-y-auto" id="heroLedger">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURE BENTO GRID ============ -->
+<section id="features" class="relative px-6 py-24 max-w-7xl mx-auto">
+  <div class="mb-14 max-w-xl">
+    <p class="text-indigo-600 text-[12px] font-bold tracking-[0.2em] uppercase mb-2.5">Architecture</p>
+    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">Simple budget tracking, built for modern SaaS.</h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- Card A: Balance Lock -->
+    <div class="md:col-span-1 md:row-span-2 bg-white border border-zinc-200/80 rounded-2xl p-6 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg hover:shadow-zinc-200/30 flex flex-col group">
+      <div class="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-5">
+        <i data-lucide="shield-alert" class="w-5 h-5 text-indigo-600"></i>
+      </div>
+      <h3 class="font-extrabold text-[17px] text-zinc-900 mb-2">Starting Balance Lock</h3>
+      <p class="text-zinc-500 text-[13px] leading-relaxed mb-6 font-medium">Configure your opening balance once. It locks in place to guarantee all upcoming ledger logs compute accurate balances — preventing drift.</p>
+
+      <div class="mt-auto bg-zinc-50 border border-zinc-150 rounded-xl p-4" id="lockCard">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-450" id="lockLabel">Locked</span>
+          <button id="lockToggle" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-500 flex items-center gap-1">
+            <i data-lucide="lock" class="w-3 h-3" id="lockIcon"></i>
+            <span id="lockBtnText">Unlock</span>
+          </button>
+        </div>
+        <p class="font-['JetBrains_Mono',monospace] text-xl font-bold text-zinc-900 mb-3" id="lockAmount">₹50,000.00</p>
+        <input type="range" min="0" max="200000" step="500" value="50000" id="lockSlider" class="w-full" disabled />
+      </div>
+    </div>
+
+    <!-- Card B: Unified Ledger -->
+    <div class="md:col-span-2 bg-white border border-zinc-200/80 rounded-2xl p-6 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg hover:shadow-zinc-200/30 group">
+      <div class="flex items-start justify-between mb-5">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center mb-4">
+            <i data-lucide="layers" class="w-5 h-5 text-violet-600"></i>
+          </div>
+          <h3 class="font-extrabold text-[17px] text-zinc-900 mb-1">Unified Transaction Ledger</h3>
+          <p class="text-zinc-500 text-[13px] leading-relaxed max-w-md font-medium">Credits and debits flow automatically into one running balance — removing the need for separate books or manual updates.</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="rounded-xl bg-emerald-500/[0.03] border border-emerald-500/15 p-4">
+          <p class="text-[10px] text-emerald-600 font-bold tracking-wide uppercase mb-1.5 flex items-center gap-1">
+            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> Inflow
+          </p>
+          <p class="font-['JetBrains_Mono',monospace] text-lg font-bold text-emerald-600">+ ₹18,200.00</p>
+          <p class="text-[10px] text-zinc-450 mt-1">Client payment · Acme Co.</p>
+        </div>
+        
+        <div class="rounded-xl bg-rose-500/[0.03] border border-rose-500/15 p-4">
+          <p class="text-[10px] text-rose-600 font-bold tracking-wide uppercase mb-1.5 flex items-center gap-1">
+            <i data-lucide="arrow-down-right" class="w-3.5 h-3.5"></i> Outflow
+          </p>
+          <p class="font-['JetBrains_Mono',monospace] text-lg font-bold text-rose-600">− ₹4,500.00</p>
+          <p class="text-[10px] text-zinc-450 mt-1">AWS · Infra hosting</p>
+        </div>
+      </div>
+      
+      <div class="mt-4 flex items-center gap-2 text-[12px] text-zinc-400 font-semibold">
+        <i data-lucide="git-merge" class="w-3.5 h-3.5"></i>
+        Merged into running balance: <span class="font-['JetBrains_Mono',monospace] text-zinc-700 font-bold">₹63,700.00</span>
+      </div>
+    </div>
+
+    <!-- Card C: Cloud Sync -->
+    <div id="sync" class="md:col-span-1 bg-white border border-zinc-200/80 rounded-2xl p-6 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg hover:shadow-zinc-200/30 group">
+      <div class="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-5">
+        <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-600"></i>
+      </div>
+      <h3 class="font-extrabold text-[17px] text-zinc-900 mb-2">Real-Time Cloud Sync</h3>
+      <p class="text-zinc-500 text-[13px] leading-relaxed mb-5 font-medium">Every change saved locally syncs instantly to your cloud database worksheets. Your reports are always perfectly in step.</p>
+      
+      <svg viewBox="0 0 200 70" class="w-full h-16">
+        <rect x="4" y="22" width="50" height="26" rx="6" fill="rgba(79,70,229,0.04)" stroke="rgba(79,70,229,0.2)"/>
+        <text x="29" y="38" text-anchor="middle" fill="#4f46e5" font-size="9" font-family="JetBrains Mono" font-weight="bold">local</text>
+        <path d="M58 35 H140" stroke="#10b981" stroke-width="2" class="sync-line" fill="none"/>
+        <rect x="146" y="22" width="50" height="26" rx="6" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.2)"/>
+        <text x="171" y="38" text-anchor="middle" fill="#10b981" font-size="9" font-family="JetBrains Mono" font-weight="bold">cloud</text>
+      </svg>
+    </div>
+
+    <!-- Card D: Payment Nodes -->
+    <div class="md:col-span-1 bg-white border border-zinc-200/80 rounded-2xl p-6 transition-all duration-[300ms] hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg hover:shadow-zinc-200/30 group">
+      <div class="w-10 h-10 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center mb-5">
+        <i data-lucide="credit-card" class="w-5 h-5 text-rose-600"></i>
+      </div>
+      <h3 class="font-extrabold text-[17px] text-zinc-900 mb-2">Multi-Channel Payment Nodes</h3>
+      <p class="text-zinc-500 text-[13px] leading-relaxed mb-5 font-medium">Tag transactions by how money actually moves, creating structured audits for easy tax filing and cash flow planning.</p>
+      
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-[11px] font-bold text-zinc-600 flex items-center gap-1.5"><i data-lucide="smartphone" class="w-3 h-3 text-zinc-400"></i>PhonePe</span>
+        <span class="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-[11px] font-bold text-zinc-600 flex items-center gap-1.5"><i data-lucide="smartphone" class="w-3 h-3 text-zinc-400"></i>GPay</span>
+        <span class="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-[11px] font-bold text-zinc-600 flex items-center gap-1.5"><i data-lucide="banknote" class="w-3 h-3 text-zinc-400"></i>Salary</span>
+        <span class="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-[11px] font-bold text-zinc-600 flex items-center gap-1.5"><i data-lucide="wallet" class="w-3 h-3 text-zinc-400"></i>Cash</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ PLAYGROUND ============ -->
+<section id="playground" class="relative px-6 py-24 max-w-5xl mx-auto">
+  <div class="text-center mb-12">
+    <p class="text-indigo-600 text-[12px] font-bold tracking-[0.2em] uppercase mb-2.5">Try it live</p>
+    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 mb-3">Log a transaction. Watch it sync.</h2>
+    <p class="text-zinc-500 max-w-lg mx-auto text-sm font-medium">Simulate your cash ledger right here: enter an amount, set the category, and watch the balance calculate.</p>
+  </div>
+
+  <div class="bg-white border border-zinc-200 rounded-2xl p-6 md:p-8 shadow-xl shadow-zinc-200/40 relative">
+    <div class="grid md:grid-cols-5 gap-8">
+
+      <!-- Input form -->
+      <div class="md:col-span-2 flex flex-col gap-4">
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-450 mb-1.5 block">Transaction Amount (₹)</label>
+          <input id="pgAmount" type="number" placeholder="0.00" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3.5 py-2.5 font-['JetBrains_Mono',monospace] text-sm text-zinc-800 outline-none focus:border-indigo-500 transition-colors" />
+        </div>
+        
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-450 mb-1.5 block">Category</label>
+          <input id="pgCategory" type="text" placeholder="e.g. Client retainer, AWS, Rent" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3.5 py-2.5 text-sm text-zinc-800 outline-none focus:border-indigo-500 transition-colors" />
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-450 mb-1.5 block">Type</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="pgCredit" class="transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-emerald-300 bg-emerald-50 text-emerald-700">
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> Credit
+            </button>
+            <button id="pgDebit" class="transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-zinc-200 text-zinc-500 hover:border-rose-300 hover:bg-rose-50/30">
+              <i data-lucide="arrow-down-right" class="w-3.5 h-3.5"></i> Debit
+            </button>
+          </div>
+        </div>
+
+        <button id="pgSubmit" class="transition-transform duration-150 active:scale-[0.98] mt-2 w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-md shadow-indigo-600/10">
+          Record Transaction
+        </button>
+      </div>
+
+      <!-- Live log -->
+      <div class="md:col-span-3">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-450">Live Simulation Log</span>
+          <span class="font-['JetBrains_Mono',monospace] text-[11px] text-zinc-400">Balance: <span id="pgBalance" class="text-zinc-800 font-bold">₹0.00</span></span>
+        </div>
+        <div id="pgLog" class="bg-zinc-50/50 border border-zinc-200 rounded-xl divide-y divide-zinc-200/50 h-72 overflow-y-auto">
+          <div class="px-4 py-8 text-center text-zinc-400 text-[13px]" id="pgEmpty">No transactions yet — record one to see it appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="pgToast" class="translate-y-5 opacity-0 transition-all duration-[300ms] absolute bottom-6 right-6 bg-white border border-zinc-200 rounded-lg px-4 py-3 flex items-center gap-2 text-[12px] font-semibold text-zinc-700 shadow-xl shadow-zinc-200/50">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+      Record synced with database.
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA + FOOTER ============ -->
+<section class="relative px-6 py-28 bg-zinc-50 border-t border-zinc-200/60">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,rgba(99,102,241,0.03),transparent_70%)]"></div>
+  <div class="relative max-w-2xl mx-auto text-center">
+    <h2 class="text-3xl font-extrabold tracking-tight text-zinc-900 mb-3">Take control of your workspace cash flow</h2>
+    <p class="text-zinc-500 mb-8 font-medium">Start organizing credits, debits, and running balances today.</p>
+    <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+      <a href="/login" class="w-full transition-transform duration-150 active:scale-[0.98] bg-zinc-950 text-white font-semibold text-sm px-6 py-3 rounded-full hover:bg-zinc-800 whitespace-nowrap flex items-center justify-center">
+        Launch Your Workspace
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-zinc-200/80 bg-white px-6 pt-16 pb-8">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
+    <div class="col-span-2">
+      <div class="flex items-center gap-2.5 mb-4">
+        <div class="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
+        </div>
+        <span class="font-bold text-sm text-zinc-900">Fin<span class="text-indigo-600 font-medium">Track</span></span>
+      </div>
+      <p class="text-zinc-500 text-[13px] leading-relaxed max-w-xs font-medium">A developer-first ledger for freelancers and teams who want simple cash book tracking without the noise.</p>
+    </div>
+    
+    <div>
+      <p class="text-[10px] uppercase tracking-wider text-zinc-400 mb-3 font-bold">Product</p>
+      <ul class="space-y-2 text-[13px] font-semibold text-zinc-500">
+        <li><a href="#features" class="hover:text-zinc-950 transition-colors">Features</a></li>
+        <li><a href="#playground" class="hover:text-zinc-950 transition-colors">Interactive Demo</a></li>
+        <li><a href="/login" class="hover:text-zinc-950 transition-colors">Launch Workspace</a></li>
+      </ul>
+    </div>
+    
+    <div>
+      <p class="text-[10px] uppercase tracking-wider text-zinc-400 mb-3 font-bold">Workspace Pages</p>
+      <ul class="space-y-2 text-[13px] font-semibold text-zinc-500">
+        <li><a href="/login" class="hover:text-zinc-950 transition-colors">Login / Register</a></li>
+        <li><a href="/dashboard" class="hover:text-zinc-950 transition-colors">Overview Ledger</a></li>
+        <li><a href="/profile" class="hover:text-zinc-950 transition-colors">Workspace Settings</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-[10px] uppercase tracking-wider text-zinc-400 mb-3 font-bold">Ledger Sheets</p>
+      <ul class="space-y-2 text-[13px] font-semibold text-zinc-500">
+        <li><a href="/credits" class="hover:text-zinc-950 transition-colors">Record Income</a></li>
+        <li><a href="/debits" class="hover:text-zinc-950 transition-colors">Record Expenses</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto border-t border-zinc-150 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <p class="text-zinc-400 text-[11px] font-medium">© 2026 FinTrack Workspace. All rights reserved.</p>
+    <p class="text-[11px] text-zinc-450 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>
+      Secure API Proxy Active
+    </p>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+
+  // ---------- Hero ledger mock rows ----------
+  const heroRows = [
+    { cat: "Client payment · Acme Co.", node: "PhonePe", amt: 18200, type: "credit", time: "2m ago" },
+    { cat: "AWS · Infra hosting", node: "Card", amt: -4500, type: "debit", time: "41m ago" },
+    { cat: "Freelance retainer · Nova", node: "GPay", amt: 22000, type: "credit", time: "1h ago" },
+    { cat: "Notion · Team plan", node: "Card", amt: -1499, type: "debit", time: "3h ago" },
+    { cat: "Salary deposit", node: "Salary", amt: 65000, type: "credit", time: "yesterday" },
+  ];
+  const heroLedger = document.getElementById('heroLedger');
+  heroRows.forEach(r => {
+    const isCredit = r.type === 'credit';
+    const row = document.createElement('div');
+    row.className = "px-4 py-2.5 flex items-center justify-between transition-all duration-200 hover:bg-zinc-50 hover:translate-x-0.5";
+    row.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center ${isCredit ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+          <i data-lucide="${isCredit ? 'arrow-up-right' : 'arrow-down-right'}" class="w-3.5 h-3.5"></i>
+        </div>
+        <div>
+          <p class="text-[12.5px] text-zinc-800 font-semibold">${r.cat}</p>
+          <p class="text-[11px] text-zinc-400 font-medium">${r.node} · ${r.time}</p>
+        </div>
+      </div>
+      <span class="font-['JetBrains_Mono',monospace] text-[12.5px] font-bold ${isCredit ? 'text-emerald-600' : 'text-rose-600'}">${isCredit ? '+' : '−'} ₹${Math.abs(r.amt).toLocaleString('en-IN')}</span>
+    `;
+    heroLedger.appendChild(row);
+  });
+  lucide.createIcons();
+
+  // ---------- Balance lock card ----------
+  const lockToggle = document.getElementById('lockToggle');
+  const lockSlider = document.getElementById('lockSlider');
+  const lockAmount = document.getElementById('lockAmount');
+  const lockLabel = document.getElementById('lockLabel');
+  const lockBtnText = document.getElementById('lockBtnText');
+  const lockIcon = document.getElementById('lockIcon');
+  let locked = true;
+
+  function fmtINR(n){ return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2 }); }
+
+  lockSlider.addEventListener('input', () => {
+    lockAmount.textContent = fmtINR(lockSlider.value);
+  });
+
+  lockToggle.addEventListener('click', () => {
+    locked = !locked;
+    lockSlider.disabled = locked;
+    lockLabel.textContent = locked ? 'Locked' : 'Unlocked — set starting balance';
+    lockBtnText.textContent = locked ? 'Unlock' : 'Lock';
+    lockIcon.setAttribute('data-lucide', locked ? 'lock' : 'unlock');
+    lucide.createIcons();
+  });
+
+  // ---------- Playground ----------
+  const pgAmount = document.getElementById('pgAmount');
+  const pgCategory = document.getElementById('pgCategory');
+  const pgCredit = document.getElementById('pgCredit');
+  const pgDebit = document.getElementById('pgDebit');
+  const pgSubmit = document.getElementById('pgSubmit');
+  const pgLog = document.getElementById('pgLog');
+  const pgEmpty = document.getElementById('pgEmpty');
+  const pgBalance = document.getElementById('pgBalance');
+  const pgToast = document.getElementById('pgToast');
+
+  let pgType = 'credit';
+  let balance = 0;
+
+  function setType(type){
+    pgType = type;
+    if(type === 'credit'){
+      pgCredit.className = "transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-emerald-300 bg-emerald-50 text-emerald-700";
+      pgDebit.className = "transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-zinc-200 text-zinc-500 hover:border-rose-300 hover:bg-rose-50/30";
+    } else {
+      pgDebit.className = "transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-rose-300 bg-rose-50 text-rose-700";
+      pgCredit.className = "transition-transform duration-150 active:scale-[0.98] py-2.5 rounded-lg border text-sm font-semibold flex items-center justify-center gap-1.5 border-zinc-200 text-zinc-500 hover:border-emerald-300 hover:bg-emerald-50/30";
+    }
+  }
+  pgCredit.addEventListener('click', () => setType('credit'));
+  pgDebit.addEventListener('click', () => setType('debit'));
+
+  function showToast(){
+    pgToast.classList.remove('translate-y-5', 'opacity-0');
+    pgToast.classList.add('translate-y-0', 'opacity-100');
+    setTimeout(() => {
+      pgToast.classList.remove('translate-y-0', 'opacity-100');
+      pgToast.classList.add('translate-y-5', 'opacity-0');
+    }, 2200);
+  }
+
+  pgSubmit.addEventListener('click', () => {
+    const amt = parseFloat(pgAmount.value);
+    const cat = pgCategory.value.trim() || 'Uncategorized';
+    if(!amt || amt <= 0){
+      pgAmount.classList.add('border-rose-500/70');
+      setTimeout(() => pgAmount.classList.remove('border-rose-500/70'), 900);
+      return;
+    }
+
+    if(pgEmpty) pgEmpty.remove();
+
+    const isCredit = pgType === 'credit';
+    balance += isCredit ? amt : -amt;
+
+    const row = document.createElement('div');
+    row.className = "px-4 py-3 flex items-center justify-between transition-all duration-200 hover:bg-zinc-50 hover:translate-x-0.5 opacity-0 animate-in fade-in duration-200";
+    row.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center ${isCredit ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+          <i data-lucide="${isCredit ? 'arrow-up-right' : 'arrow-down-right'}" class="w-3.5 h-3.5"></i>
+        </div>
+        <div>
+          <p class="text-[12.5px] text-zinc-800 font-semibold">${cat}</p>
+          <p class="text-[11px] text-zinc-400 font-medium">just now</p>
+        </div>
+      </div>
+      <span class="font-['JetBrains_Mono',monospace] text-[12.5px] font-bold ${isCredit ? 'text-emerald-600' : 'text-rose-600'}">${isCredit ? '+' : '−'} ₹${amt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+    `;
+    pgLog.prepend(row);
+    lucide.createIcons();
+    requestAnimationFrame(() => row.classList.remove('opacity-0'));
+
+    pgBalance.textContent = fmtINR(balance.toFixed(2));
+    pgAmount.value = '';
+    pgCategory.value = '';
+    showToast();
+  });
+</script>
+</body>
+</html>

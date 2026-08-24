@@ -1,0 +1,17 @@
+{
+  "name": "fintrack-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FinTrack — Personal Finance, Incomes, Expenses & Debt Ledger",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "cd backend && mvn spring-boot:run",
+    "build": "npm --prefix frontend run build && cd backend && mvn clean package -DskipTests",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "cd backend && mvn clean package -DskipTests"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

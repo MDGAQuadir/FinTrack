@@ -1,0 +1,9 @@
+Date,Transaction Details,Type,Amount,Status
+2026-08-01,Paid to Swiggy Bangalore,DEBIT,299.00,COMPLETED
+2026-08-03,Received from Rahul Sharma UPI,CREDIT,1500.00,COMPLETED
+2026-08-05,Paid to Apollo Pharmacy,DEBIT,450.00,COMPLETED
+2026-08-07,Paid to Starbucks Coffee Indiranagar,DEBIT,380.00,COMPLETED
+2026-08-10,Paid to BookMyShow Movie Tickets,DEBIT,850.00,COMPLETED
+2026-08-14,Cashback Received GPay Scratch Card,CREDIT,50.00,COMPLETED
+2026-08-18,Paid to Airtel Broadband Bill,DEBIT,1179.00,COMPLETED
+2026-08-20,Paid to Cult Fit Gym Subscription,DEBIT,2500.00,COMPLETED
