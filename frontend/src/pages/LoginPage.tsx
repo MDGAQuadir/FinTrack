@@ -5,7 +5,6 @@ import { ThemeToggle } from '../hooks/useTheme'
 import { Link } from 'react-router-dom'
 import {
   Mail,
-  Lock,
   User,
   Phone,
   Briefcase,
