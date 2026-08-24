@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 1. Check Email API call (hits local proxy backend)
+  // 1. Check Email API call (Direct Instant Login if user exists)
   const checkEmail = async (inputEmail: string) => {
     setLoading(true)
     setError(null)
@@ -116,10 +116,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await axios.post('/api/auth/check', { email: inputEmail })
-      const { exists } = response.data
+      const { exists, token, user: returnedUser } = response.data
 
-      if (exists) {
-        setStep('otp')
+      if (exists && token && returnedUser) {
+        const userWithToken = { ...returnedUser, token }
+        setUser(userWithToken)
+        localStorage.setItem('fintrack_user', JSON.stringify(userWithToken))
+        setStep('dashboard')
       } else {
         setStep('register')
       }
@@ -131,17 +134,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // 2. Prepare register flow (registers user in database and generates OTP workflow)
+  // 2. Prepare register flow (Direct Instant Registration)
   const prepareRegister = async (formData: Omit<UserProfile, '_id' | 'Balance'>) => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await axios.post('/api/auth/register', formData)
-      if (response.data?.success) {
+      if (response.data?.success && response.data?.token) {
         const createdUser = response.data.user
-        setUser(createdUser)
-        setStep('register-otp')
+        const token = response.data.token
+        const userWithToken = { ...createdUser, token }
+        setUser(userWithToken)
+        localStorage.setItem('fintrack_user', JSON.stringify(userWithToken))
+        setStep('dashboard')
       } else {
         throw new Error('Registration failed to return a valid user.')
       }

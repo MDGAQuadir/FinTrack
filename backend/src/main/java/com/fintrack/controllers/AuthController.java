@@ -105,19 +105,17 @@ public class AuthController {
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            String otp = generateOtp();
-            user.setOtp(otp);
-            // 5-Minute OTP Expiration
-            user.setOtpExpires(new Date(System.currentTimeMillis() + 5 * 60 * 1000L));
             user.setLastLoginRequest(new Date());
             userRepository.save(user);
 
-            rateLimitingService.resetFailedAttempts(normalizedEmail);
-            emailService.sendOtpEmail(normalizedEmail, otp);
+            // Direct instant login without OTP barrier
+            String token = jwtUtil.generateToken(user.getId(), user.getEmail());
 
             return ResponseEntity.ok(ApiResponse.builder()
                     .success(true)
                     .exists(true)
+                    .token(token)
+                    .user(sanitizeUser(user))
                     .build());
         } else {
             return ResponseEntity.ok(ApiResponse.builder()
@@ -138,43 +136,34 @@ public class AuthController {
         }
 
         String normalizedEmail = email.trim().toLowerCase();
-        String clientIp = getClientIp(httpRequest);
-
-        // Multi-dimensional Rate Limiting (Email + IP)
-        var rateCheck = rateLimitingService.tryAcquireOtpRequest(normalizedEmail, clientIp);
-        if (!rateCheck.isAllowed()) {
-            log.warn("🚨 [RateLimit] Register OTP limit reached for email '{}' or IP '{}'", normalizedEmail, clientIp);
-            return ResponseEntity.status(429)
-                    .header("Retry-After", String.valueOf(rateCheck.getRetryAfterSeconds()))
-                    .body(ApiResponse.builder()
-                            .success(false)
-                            .message(rateCheck.getMessage())
-                            .build());
-        }
 
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            return ResponseEntity.badRequest().body(ApiResponse.builder().success(false).message("User already exists with this email.").build());
+            User existing = userRepository.findByEmailIgnoreCase(normalizedEmail).orElse(null);
+            String token = jwtUtil.generateToken(existing.getId(), existing.getEmail());
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .success(true)
+                    .token(token)
+                    .user(sanitizeUser(existing))
+                    .build());
         }
 
-        String otp = generateOtp();
         User newUser = new User();
         newUser.setEmail(normalizedEmail);
-        newUser.setName(request.getResolvedName() != null ? request.getResolvedName() : "");
+        newUser.setName(request.getResolvedName() != null ? request.getResolvedName() : "FinTrack User");
         newUser.setPhone(request.getResolvedPhone() != null ? request.getResolvedPhone() : "");
         newUser.setOccupation(request.getResolvedOccupation() != null ? request.getResolvedOccupation() : "");
         newUser.setCity(request.getResolvedCity() != null ? request.getResolvedCity() : "");
         newUser.setBalance(null);
-        newUser.setOtp(otp);
-        // 5-Minute OTP Expiration
-        newUser.setOtpExpires(new Date(System.currentTimeMillis() + 5 * 60 * 1000L));
         newUser.setLastLoginRequest(new Date());
 
         userRepository.save(newUser);
-        rateLimitingService.resetFailedAttempts(normalizedEmail);
-        emailService.sendOtpEmail(normalizedEmail, otp);
+
+        // Direct instant login upon registration
+        String token = jwtUtil.generateToken(newUser.getId(), newUser.getEmail());
 
         return ResponseEntity.ok(ApiResponse.builder()
                 .success(true)
+                .token(token)
                 .user(sanitizeUser(newUser))
                 .build());
     }
