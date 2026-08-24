@@ -7,13 +7,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class SpaForwardingController {
 
     /**
-     * Forwards all non-API and non-static browser requests to index.html
-     * so that client-side React Router handles URLs like /dashboard, /credits, /login, etc.
+     * Forwards all React Single Page Application client-side routes to index.html
+     * so that browser reloads work seamlessly without colliding with Spring Boot REST endpoints.
      */
     @GetMapping(value = {
             "/",
-            "/{path:^(?!api|actuator)[^\\.]*}",
-            "/{segment:^(?!api|actuator)[^\\.]*}/**/{path:[^\\.]*}"
+            "/login",
+            "/dashboard",
+            "/credits",
+            "/debits",
+            "/debts",
+            "/statement",
+            "/profile",
+            "/support"
     })
     public String forwardSpaRoutes() {
         return "forward:/index.html";
