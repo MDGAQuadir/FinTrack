@@ -1,30 +1,31 @@
 # ==============================================================================
-# Render Infrastructure as Code Blueprint: render.yaml (with Neon Serverless PostgreSQL)
-# 1. Native Spring Boot Java Web Service (connected to external Neon DB)
-# 2. Native React + Vite Static Site
+# Render Unified Service Blueprint: render.yaml (Docker-based)
+# Single Web Service serving both React Frontend and Spring Boot Backend
+# Connected to external Neon Serverless PostgreSQL
 # ==============================================================================
 
 services:
-  # ----------------------------------------------------------------------------
-  # 1. Backend: Spring Boot Java Web Service (Native Java 21)
-  # ----------------------------------------------------------------------------
   - type: web
-    name: fintrack-backend
-    runtime: java
+    name: fintrack
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     region: singapore
     plan: free
-    buildCommand: cd backend && mvn clean package -DskipTests
-    startCommand: java -jar backend/target/fintrack-backend-1.0.0.jar
     healthCheckPath: /actuator/health
     envVars:
       - key: PORT
         value: 8080
       - key: DEVELOPMENT_MODE
         value: "false"
-      # Paste your Neon or Cloud PostgreSQL connection details in Render Dashboard
-      - key: POSTGRES_URL
+      # Neon PostgreSQL JDBC Connection details (SPRING_DATASOURCE_* or POSTGRES_*)
+      - key: SPRING_DATASOURCE_URL
         sync: false
-      - key: DATABASE_URL
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: POSTGRES_URL
         sync: false
       - key: POSTGRES_USER
         sync: false
@@ -46,25 +47,3 @@ services:
         sync: false
       - key: GENERIC_WEBHOOK_SECRET
         sync: false
-
-  # ----------------------------------------------------------------------------
-  # 2. Frontend: React + Vite Static Site (Native Node.js)
-  # ----------------------------------------------------------------------------
-  - type: web
-    name: fintrack-frontend
-    runtime: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    routes:
-      # Proxy API requests to backend
-      - type: rewrite
-        source: /api/*
-        destination: https://fintrack-backend.onrender.com/api/*
-      # Proxy Actuator health to backend
-      - type: rewrite
-        source: /actuator/health
-        destination: https://fintrack-backend.onrender.com/actuator/health
-      # SPA fallback routing
-      - type: rewrite
-        source: /*
-        destination: /index.html
